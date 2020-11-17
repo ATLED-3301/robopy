@@ -5,7 +5,7 @@ A kinematichs library for robotichs application - in development
 # usage
 simply import:
 
-+ kinematichs.serial.parametrization*
++ kinematichs.serial.parametrization
 + kinematichs.serial.serial_chain
 + kinematichs.parallel.parallel
 
