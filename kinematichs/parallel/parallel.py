@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import numpy as np
 import numpy as np 
 from kinematichs.support.matrixs import mdot 

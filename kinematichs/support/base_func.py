@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import numpy as np
 from numpy.linalg import inv 
 from scipy.spatial import distance 
@@ -6,8 +7,6 @@ from math import cos
 from numba import jit
 import numpy as np
 from kinematichs.support.matrixs import mdot,Tx,Tz,Ty
-
-
 
 def r_jacobian(ax_previus, previus_point, final_point):
 
