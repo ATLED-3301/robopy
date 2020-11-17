@@ -9,7 +9,7 @@ simply import:
 + kinematichs.serial.serial_chain
 + kinematichs.parallel.parallel
 
-in your python file,you may need to intall some library, then build your robotic system using joint class and HD convention, setting all parameters you need.
+in your python file,you may need to intall some library, then build your robotic system using joint class and DH convention, setting all parameters you need.
 
 classes :
 
