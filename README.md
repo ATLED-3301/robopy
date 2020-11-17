@@ -9,7 +9,7 @@ simply import:
 + kinematichs.serial.serial_chain
 + kinematichs.parallel.parallel
 
-in your python file,you may need to intall some library(like numpy, scipy ...)
+in your python file,you may need to intall some library(like numpy, scipy ...). You can use requirements.txt to install all the libraries.
 
 ## details
 classes :
