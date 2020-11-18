@@ -24,7 +24,7 @@ this library solve inverse kinematichs for a single serial robot or for a signle
 
 You can assign coordinates x y z yaw pitch roll and the program can solve inverse kinematichs using Levenberg-Marquart algorithm. When you try to move a serial you assign end effector position, then you move parallel you assign the position of the floating base of the robot.
 
-You can also use numpy.nan to tell the program you have no interest to assign that coordinates (usefull for not fully attuated robot where you cannot assign all coordinates).
+You can also use numpy.nan to tell the program you have no interest to assign that coordinates (useful for not fully attuated robot where you cannot assign all coordinates).
 
 Some examples is in jupiter test file
 
