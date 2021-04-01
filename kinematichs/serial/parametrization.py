@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import numpy as np 
 from kinematichs.support.matrixs import mdot 
 from kinematichs.support.base_func import jacobian_g

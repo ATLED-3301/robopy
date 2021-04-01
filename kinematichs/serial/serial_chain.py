@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import numpy as np 
 from kinematichs.support.matrixs import mdot 
 from kinematichs.support.base_func import jacobian_g
@@ -6,6 +5,7 @@ from kinematichs.support.base_func import jacobian_a
 from kinematichs.serial.parametrization import Joint
 from kinematichs.support.base_func import euler_angles
 import time
+from numba import jit,njit
 
 
 class Kinematichs_chain():
@@ -50,10 +50,13 @@ class Kinematichs_chain():
         self.get_J_a()
         self.get_J_g()
         
-        self.stepsize = 0.9
-        self.K = 0.9
-        self.itermax = 100
-        self.min_error= 10^-3
+        self.stepsize = 1
+        self.reduction_rate = 0.9
+        self.stepsize_max = 15
+        self.K = 1
+        self.itermax = 20
+        self.iter = 20
+        self.min_error= 10^-4
 
         self.space_trajectory = None
         self.joint_trajectory = None
@@ -69,7 +72,7 @@ class Kinematichs_chain():
         if isinstance(name, str):
             return name
         else : 
-            print(f"name must be string , ho {type(name)}")
+            print(f"name must be string , got {type(name)}")
             return None
 
     def get_joint_names(self,par):
@@ -148,15 +151,17 @@ class Kinematichs_chain():
                 q_list.append(q)
         self.q = q_list
 
-
     def _IK_solve_point(self,goal,act_array): 
         self.active_par = self.get_active_par(self.par)
         self.joint_types = self.get_joint_types()
         self.get_q()
+        itermax =self.itermax
         stepsize = self.stepsize
+        stepmax = self.stepsize_max 
         types = self.joint_types
         K = self.K
-        itermax = self.itermax
+        rate = self.reduction_rate
+        iteration = self.iter 
         minerror = self.min_error
         validcoords = []
         for i,g in enumerate(goal):
@@ -169,27 +174,40 @@ class Kinematichs_chain():
         a_array = np.concatenate((a_p_array,a_z_array))
         error = np.subtract(goal,a_array)[validcoords]
         q_new = self.q_list
-
-        while i<=itermax and np.any(abs(error)>minerror)==True:
+        while i<=iteration and np.any(abs(error)>minerror)==True:
             matrixs = self.global_T_matrixs
-            q = np.asarray(self.q_list)
-            a_p_array = matrixs[-1][:3,3]
-            a_z_array = euler_angles(matrixs[-1])
-            a_array = np.concatenate((a_p_array,a_z_array))
-            error = (goal[validcoords]-a_array[validcoords])
-            J_a = jacobian_a(matrixs,types)[validcoords,:]
-            Jqud = np.dot(J_a.T, J_a)
-            M_LB = np.dot(  np.linalg.pinv( Jqud + K * np.eye(Jqud.shape[0]) ) , J_a.T )
-            dq = stepsize * np.dot( M_LB , error )
-            q_new = q + dq * act_array
+            q = np.asarray(q_new)
+            stepsize = stepmax*np.power(rate,i+1)
+            q_new, a_array = self._iter_solve(matrixs, goal, validcoords, types, K, stepsize, q, act_array,q_new,i)
             self.set_joint_var( q_new )
             self.get_T_matrixs()
             self.get_T_globals()
+            error = np.subtract(goal,a_array)[validcoords]
             i += 1
-        self.joint_trajectory.append(self.q_list)
+        self.set_joint_var( q_new )
+        self.joint_trajectory.append(q_new)
         self.space_trajectory.append(a_array)
 
+    @staticmethod
+    @jit(fastmath = True,parallel = True)
+    def _iter_solve(matrixs, goal, validcoords, types, K, stepsize, q, act_array, q_new,i= 1):
+        a_p_array = matrixs[-1][:3,3]
+        a_z_array = euler_angles(matrixs[-1])
+        a_array = np.concatenate((a_p_array,a_z_array))
+        error = (goal[validcoords]-a_array[validcoords])
+        J_a = jacobian_a(matrixs,types)[validcoords,:]
+        lamb = 10 * np.power(0.7,i)
+        Jqud = np.dot(J_a.T, J_a)
+        #M_LB = np.linalg.pinv(J_a)
+        M_LB = J_a.T   # VERSIONE SEMOPLIFICATA
+        M_LB = np.dot( np.linalg.pinv( Jqud + lamb * np.eye(Jqud.shape[0]) ) , J_a.T ) #per levemberg
+        dq = stepsize * np.dot( M_LB , error )
+        q_new = q + dq * act_array
+        return q_new, a_array
+
     def IK_solve_points(self,goals,active = "all"):
+        itermax = self.itermax
+        self.iter = itermax#np.ceil(itermax/len(goals))
         if active == "all":
             act_array = np.ones(len(self.joint_names_actv))
         else:
