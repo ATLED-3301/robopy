@@ -1,30 +1,44 @@
-# robot-kinematichs
-A kinematichs library for robotichs application - in development
+# Robot Kinematics Library
 
----
-# importing
-simply import:
+A kinematics library for robotic applications - currently in development.
 
-+ kinematichs.serial.parametrization
-+ kinematichs.serial.serial_chain
-+ kinematichs.parallel.parallel
+## Importing
 
-in your python file,you may need to intall some library(like numpy, scipy ...). You can use requirements.txt to install all the libraries.
+To use this library, simply import the following modules in your Python file:
 
-## details
-classes :
+import kinematics.serial.parametrization
+import kinematics.serial.serial_chain
+import kinematics.parallel.parallel
 
-+ joint - use Dinavit Hartemberg convention for joint definition
-+ serial chain - use joint to define a serial robot
-+ parallel - use serial chain to cretae a parallel robot 
+Make sure to install the required libraries (e.g., numpy, scipy) by using the provided requirements.txt file.
 
-Details for the single classes are in the markdown of the classes.
+## Details
 
-this library solve inverse kinematichs for a single serial robot or for a signle parallel robot.
+### Classes
+- Joint
 
-You can assign coordinates x y z yaw pitch roll and the program can solve inverse kinematichs using Levenberg-Marquart algorithm. When you try to move a serial you assign end effector position, then you move parallel you assign the position of the floating base of the robot.
+    The Joint class utilizes the Denavit-Hartenberg convention for joint           definition.
 
-You can also use numpy.nan to tell the program you have no interest to assign that coordinates (useful for not fully attuated robot where you cannot assign all coordinates).
+- Serial Chain
 
-Some examples is in jupiter test file
+    The Serial Chain class uses the Joint class to define a serial robot.
 
+- Parallel
+
+    The Parallel class uses the Serial Chain class to create a parallel robot.
+
+For detailed information about each class, refer to the individual markdown files for the respective classes.
+
+## Functionality
+
+This library solves inverse kinematics for both a single serial robot and a single parallel robot.
+
+You can assign coordinates (x, y, z, yaw, pitch, roll), and the program can solve inverse kinematics using the Levenberg-Marquart algorithm. When moving a serial robot, assign the end effector position; when moving a parallel robot, assign the position of the floating base of the robot.
+
+Additionally, you can use numpy.nan to indicate to the program that you have no interest in assigning specific coordinates. This is particularly useful for not fully actuated robots where not all coordinates can be assigned.
+
+## Examples
+
+Check out the Jupyter test file for some usage examples.
+
+Feel free to contribute and improve this library!
