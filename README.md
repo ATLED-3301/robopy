@@ -41,7 +41,7 @@ Additionally, you can use numpy.nan to indicate to the program that you have no 
 
 Check out the Jupyter test file for some usage examples.
 
-## License
+## License
 
 This project is licensed under the MIT License. Feel free to contribute and improve this library!
 
